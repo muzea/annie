@@ -85,22 +85,9 @@ func init() {
 	flag.StringVar(&config.YoukuPassword, "password", "", "Youku password")
 	// youtube
 	flag.BoolVar(&config.YouTubeStream2, "ytb-stream2", false, "Use data in url_encoded_fmt_stream_map")
-	var singleThreadSpeedLimit string
+	
 	flag.StringVar(&singleThreadSpeedLimit, "singleThreadSpeedLimit", "", "Limit the speed of each thread, 0 is unlimited")
 
-	flag.Parse()
-
-	if singleThreadSpeedLimit == "" || singleThreadSpeedLimit == "0" {
-		config.SingleThreadSpeedLimit = 0
-	} else {
-		size, err := goUnits.FromHumanSize(singleThreadSpeedLimit)
-		if err != nil {
-			printError("", err)
-			config.SingleThreadSpeedLimit = 0
-		} else {
-			config.SingleThreadSpeedLimit = size
-		}
-	}
 }
 
 func printError(url string, err error) {
@@ -209,6 +196,7 @@ func download(videoURL string) bool {
 }
 
 func main() {
+	flag.Parse()
 	args := flag.Args()
 	if config.Version {
 		utils.PrintVersion()
@@ -251,6 +239,18 @@ func main() {
 				return
 			}
 			config.Cookie = string(data)
+		}
+	}
+	var singleThreadSpeedLimit string
+	if singleThreadSpeedLimit == "" || singleThreadSpeedLimit == "0" {
+		config.SingleThreadSpeedLimit = 0
+	} else {
+		size, err := goUnits.FromHumanSize(singleThreadSpeedLimit)
+		if err != nil {
+			printError("", err)
+			config.SingleThreadSpeedLimit = 0
+		} else {
+			config.SingleThreadSpeedLimit = size
 		}
 	}
 	var isErr bool
